@@ -1,4 +1,0 @@
-libs
-====
-
-PHP libs (classes)
