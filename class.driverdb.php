@@ -34,25 +34,25 @@ class DriverDB extends DB {
 	 * in @param (int) $idn - id of record
 	 * @return bool
 	 */
-	public function DelOne($tbl, $idn)
+	public function DelOne($tbl, $idn, $val)
 	{
 		
 		$idn = (int) $idn;
 	
-		if ($result = $this->pdo->prepare("DELETE FROM `".$tbl."` WHERE `id`=:idn LIMIT 1"))
+		if ($result = $this->pdo->prepare("DELETE FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
 		{
 		
-			$result->bindValue(":idn",$idn,PDO::PARAM_INT);
+			$result->bindValue(":val",$val,PDO::PARAM_INT);
 			
 			$result->execute();
 			
 		}
 		
 		
-		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `id`=:idn"))
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$idn."`=:val"))
 		{
 		
-			$result->bindValue(":idn",$idn,PDO::PARAM_INT);
+			$result->bindValue(":val",$val,PDO::PARAM_INT);
 			
 			$result->execute();
 			
@@ -182,6 +182,32 @@ class DriverDB extends DB {
 		
 		return FALSE;
 	
+	}
+	
+	/* count some rows
+	 * @param (string) $tbl - name of the table
+	 * @param (string) $clm - requested column
+	 * @param $idn - identifier of row
+	 * @param $val - value of row
+	 * @return (int) $count
+	 */
+	public function CountRows($tbl,$clm,$idn,$val)
+	{
+	
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val"))		
+		{
+		
+			$result->bindValue(":val",$val);
+			$result->execute();
+			
+			$count = $result->rowCount();
+		
+			return $count;
+		
+		}
+		
+		return FALSE;
+		
 	}
 
 
