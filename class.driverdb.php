@@ -9,9 +9,10 @@ class DriverDB extends DB {
 	
 	}
 	
-	// getting all data from table 
-	// in @param (string) $tbl - name of the table
-	// out @return (array) $data
+	/* getting all data from table 
+	 * in @param (string) $tbl - name of the table
+	 * out @return (array) $data
+	 */
 	public function GetData($tbl)
 	{
 	
@@ -71,6 +72,42 @@ class DriverDB extends DB {
 			}
 		}
 
+		
+		return FALSE;
+	
+	}
+	
+
+	/* Checking if the Row exists in the table or No.
+	 * @param (string) $tbl - name of the table
+	 * @param (string) $clm - column name
+	 * @param (string/int) $rc - record value
+	 */
+	public function ExistsRow($tbl,$clm,$rc)
+	{
+	
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$clm."`=:rc"))
+		{
+		
+			$result->bindValue(":rc",$rc);
+			
+			$result->execute();
+			
+			$nRows = $result->fetchColumn();
+			
+			if ($nRows==="0") {
+			
+				return FALSE;
+			
+			}
+			else
+			{
+			
+				return TRUE;
+			
+			}
+		
+		}
 		
 		return FALSE;
 	
