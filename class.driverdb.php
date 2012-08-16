@@ -27,6 +27,54 @@ class DriverDB extends DB {
 		}
 	
 	}
+	
+	/* Delete One Record
+	 * in @param (string) $tbl - name of the table
+	 * in @param (int) $idn - id of record
+	 * @return bool
+	 */
+	public function DelOne($tbl, $idn)
+	{
+		
+		$idn = (int) $idn;
+	
+		if ($result = $this->pdo->prepare("DELETE FROM `".$tbl."` WHERE `id`=:idn LIMIT 1"))
+		{
+		
+			$result->bindValue(":idn",$idn,PDO::PARAM_INT);
+			
+			$result->execute();
+			
+		}
+		
+		
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `id`=:idn"))
+		{
+		
+			$result->bindValue(":idn",$idn,PDO::PARAM_INT);
+			
+			$result->execute();
+			
+			$nRows = $result->fetchColumn();
+			
+			if ($nRows === "0")
+			{
+				
+				return TRUE;
+			
+			}
+			else
+			{
+			
+				return FALSE;
+			
+			}
+		}
+
+		
+		return FALSE;
+	
+	}
 
 
 }
