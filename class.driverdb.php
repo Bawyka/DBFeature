@@ -112,6 +112,47 @@ class DriverDB extends DB {
 		return FALSE;
 	
 	}
+	
+	
+	/* Update One Record
+	 * @param (string) $tbl - tableName 
+	 * @param (string) $clm - Column Name
+	 * @param (string/int) $val - value
+	 * @return bool
+	 */
+	public function UpdOne($tbl,$clm,$upd,$idn,$val)
+	{
+	
+		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	
+		if ($result = $this->pdo->prepare("UPDATE `".$tbl."` SET `".$clm."`=:upd WHERE `".$idn."`=:val"))
+		{
+		
+			$result->bindValue(":upd",$upd);
+			$result->bindValue(":val",$val);
+			
+			$result->execute();
+			
+			$count = $result->rowCount();
+			
+			if ($count===0)
+			{
+			
+				return FALSE;
+			
+			}
+			else
+			{
+			
+				return TRUE;
+			
+			}
+		
+		}
+		
+		return FALSE;
+	
+	}
 
 
 }
