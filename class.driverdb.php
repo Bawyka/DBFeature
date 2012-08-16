@@ -153,6 +153,36 @@ class DriverDB extends DB {
 		return FALSE;
 	
 	}
+	
+	
+	/* Get One Data
+	 * @param (string) $tbl - table name
+	 * @param (string) $clm - column of wanted data
+	 * @param $idn - identifier of WHERE
+	 * @param $val - identifier value
+	 * @return $data
+	 */
+	public function GetOne($tbl,$clm,$idn,$val)
+	{
+	
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		{
+		
+			$result->bindValue(":val",$val);
+			
+			$result->execute();
+			
+			$assoc = $result->fetch(PDO::FETCH_ASSOC);
+			
+			$data = $assoc[$clm];
+			
+			return $data;
+		
+		}
+		
+		return FALSE;
+	
+	}
 
 
 }
