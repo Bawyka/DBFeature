@@ -86,7 +86,7 @@ class DriverDB extends DB {
 	public function ExistsRow($tbl,$clm,$rc)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$clm."`=:rc"))
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$clm."`=:rc LIMIT 1"))
 		{
 		
 			$result->bindValue(":rc",$rc);
@@ -125,7 +125,7 @@ class DriverDB extends DB {
 	
 		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	
-		if ($result = $this->pdo->prepare("UPDATE `".$tbl."` SET `".$clm."`=:upd WHERE `".$idn."`=:val"))
+		if ($result = $this->pdo->prepare("UPDATE `".$tbl."` SET `".$clm."`=:upd WHERE `".$idn."`=:val LIMIT 1"))
 		{
 		
 			$result->bindValue(":upd",$upd);
@@ -247,5 +247,43 @@ class DriverDB extends DB {
 	
 	}
 
+	
+	/* Get Every Record 
+	 * @param (string) $tbl - table name
+	 * @param (string) $clm  - name of the requested column
+	 * @param (string) $idn - identifier
+	 * @param (string) $val - value of identifier
+	 * @return (associative array) $data
+	 */
+	public function GetEvery($tbl,$clm,$idn,$val)
+	{
+	
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val"))
+		{
+		
+			$result->bindValue(":val",$val);
+			
+			$result->execute();
+			
+			$data = $result->fetchAll(PDO::FETCH_ASSOC);
+			
+			if (is_array($data))
+			{
+			
+				return $data;
+			
+			}
+			else
+			{
+			
+				return FALSE;
+			
+			}
+		
+		}
+		
+		return FALSE;
+	
+	}
 
 }
