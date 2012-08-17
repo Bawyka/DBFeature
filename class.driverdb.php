@@ -209,6 +209,43 @@ class DriverDB extends DB {
 		return FALSE;
 		
 	}
+	
+	
+	/* fetch whole row 
+	 * @param (string) $tbl - name of the table
+	 * @param $idn - identifier
+	 * @param $val - value of identifier
+	 */
+	public function GetRec($tbl,$idn,$val)
+	{
+	
+		if ($result = $this->pdo->prepare("SELECT * FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		{
+		
+			$result->bindValue(":val",$val);
+			
+			$result->execute();
+			
+			$data = $result->fetch(PDO::FETCH_ASSOC);
+			
+			if (is_array($data)) 
+			{
+			
+				return $data;
+			
+			}
+			else
+			{
+			
+				return FALSE;
+			
+			}
+		
+		}
+		
+		return FALSE;
+	
+	}
 
 
 }
