@@ -3,20 +3,57 @@
 # ДРАЙВЕР ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ
 class DriverDB extends DB {
 
+	// current table
+	protected $tbl = "";
+
 	function __construct(){
 	
 		parent::__construct();
+		
+	}
+	
+	
+	public function __call( $method, $param )
+	{
+		
+		$tables = array();
+		
+		if ($result = $this->pdo->query("SHOW TABLES"))
+		{
+		
+			while ($row = $result->fetch(PDO::FETCH_NUM))
+			{
+			
+				$tables[] = $row[0];
+			
+			}
+		
+		}
+		
+		if (in_array($method,$tables))
+		{
+		
+			$this->tbl = $method;
+		
+			return $this;
+			
+		}
+		else
+		{
+		
+			return FALSE;
+		
+		}
 	
 	}
 	
 	/* getting all data from table 
-	 * in @param (string) $tbl - name of the table
-	 * out @return (array) $data
+	 * out @return (associative array) $data
 	 */
-	public function GetData($tbl)
+	public function GetData()
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT * FROM ".$tbl.""))
+		if ($result = $this->pdo->prepare("SELECT * FROM ".$this->tbl.""))
 		{
 		
 			$result->execute();
@@ -30,29 +67,27 @@ class DriverDB extends DB {
 	}
 	
 	/* Delete One Record
-	 * in @param (string) $tbl - name of the table
-	 * in @param (int) $idn - id of record
+	 * @param (int) $idn - identifier of record
+	 * @param $val - value of the identifier
 	 * @return bool
 	 */
-	public function DelOne($tbl, $idn, $val)
+	public function DelOne($clm, $val)
 	{
-		
-		$idn = (int) $idn;
 	
-		if ($result = $this->pdo->prepare("DELETE FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		if ($result = $this->pdo->prepare("DELETE FROM `".$this->tbl."` WHERE `".$clm."`=:val LIMIT 1"))
 		{
 		
-			$result->bindValue(":val",$val,PDO::PARAM_INT);
+			$result->bindValue(":val",$val);
 			
 			$result->execute();
 			
 		}
 		
 		
-		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$idn."`=:val"))
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$this->tbl."` WHERE `".$clm."`=:val"))
 		{
 		
-			$result->bindValue(":val",$val,PDO::PARAM_INT);
+			$result->bindValue(":val",$val);
 			
 			$result->execute();
 			
@@ -79,14 +114,13 @@ class DriverDB extends DB {
 	
 
 	/* Checking if the Row exists in the table or No.
-	 * @param (string) $tbl - name of the table
 	 * @param (string) $clm - column name
 	 * @param (string/int) $rc - record value
 	 */
-	public function ExistsRow($tbl,$clm,$rc)
+	public function ExistsRow($clm,$rc)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$tbl."` WHERE `".$clm."`=:rc LIMIT 1"))
+		if ($result = $this->pdo->prepare("SELECT COUNT(id) FROM `".$this->tbl."` WHERE `".$clm."`=:rc LIMIT 1"))
 		{
 		
 			$result->bindValue(":rc",$rc);
@@ -115,17 +149,14 @@ class DriverDB extends DB {
 	
 	
 	/* Update One Record
-	 * @param (string) $tbl - tableName 
 	 * @param (string) $clm - Column Name
 	 * @param (string/int) $val - value
 	 * @return bool
 	 */
-	public function UpdOne($tbl,$clm,$upd,$idn,$val)
+	public function UpdOne($clm,$upd,$idn,$val)
 	{
 	
-		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	
-		if ($result = $this->pdo->prepare("UPDATE `".$tbl."` SET `".$clm."`=:upd WHERE `".$idn."`=:val LIMIT 1"))
+		if ($result = $this->pdo->prepare("UPDATE `".$this->tbl."` SET `".$clm."`=:upd WHERE `".$idn."`=:val LIMIT 1"))
 		{
 		
 			$result->bindValue(":upd",$upd);
@@ -156,16 +187,15 @@ class DriverDB extends DB {
 	
 	
 	/* Get One Data
-	 * @param (string) $tbl - table name
 	 * @param (string) $clm - column of wanted data
 	 * @param $idn - identifier of WHERE
 	 * @param $val - identifier value
 	 * @return $data
 	 */
-	public function GetOne($tbl,$clm,$idn,$val)
+	public function GetOne($clm,$idn,$val)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$this->tbl."` WHERE `".$idn."`=:val LIMIT 1"))
 		{
 		
 			$result->bindValue(":val",$val);
@@ -185,16 +215,15 @@ class DriverDB extends DB {
 	}
 	
 	/* count some rows
-	 * @param (string) $tbl - name of the table
 	 * @param (string) $clm - requested column
 	 * @param $idn - identifier of row
 	 * @param $val - value of row
 	 * @return (int) $count
 	 */
-	public function CountRows($tbl,$clm,$idn,$val)
+	public function CountRows($clm,$idn,$val)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val"))		
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$this->tbl."` WHERE `".$idn."`=:val"))		
 		{
 		
 			$result->bindValue(":val",$val);
@@ -212,14 +241,13 @@ class DriverDB extends DB {
 	
 	
 	/* fetch whole row 
-	 * @param (string) $tbl - name of the table
 	 * @param $idn - identifier
 	 * @param $val - value of identifier
 	 */
-	public function GetRec($tbl,$idn,$val)
+	public function GetRec($idn,$val)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT * FROM `".$tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		if ($result = $this->pdo->prepare("SELECT * FROM `".$this->tbl."` WHERE `".$idn."`=:val LIMIT 1"))
 		{
 		
 			$result->bindValue(":val",$val);
@@ -249,16 +277,15 @@ class DriverDB extends DB {
 
 	
 	/* Get Every Record 
-	 * @param (string) $tbl - table name
 	 * @param (string) $clm  - name of the requested column
 	 * @param (string) $idn - identifier
 	 * @param (string) $val - value of identifier
 	 * @return (associative array) $data
 	 */
-	public function GetEvery($tbl,$clm,$idn,$val)
+	public function GetEvery($clm,$idn,$val)
 	{
 	
-		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$tbl."` WHERE `".$idn."`=:val"))
+		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$this->tbl."` WHERE `".$idn."`=:val"))
 		{
 		
 			$result->bindValue(":val",$val);
