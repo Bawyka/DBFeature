@@ -312,5 +312,53 @@ class DriverDB extends DB {
 		return FALSE;
 	
 	}
+	
+	/* Insertion
+	 * @param (array) $params - array like "field"=>"value"
+	 * @return (int) lastinserted identifier $lId
+	 */
+	public function PutData($params = array())
+    {
+		$f = "("; $v = "("; $q = "";
+		
+		foreach ($params as $key => $val) 
+		{
+		
+			$f.=$key.",";
+			$v.=$val.",";
+			$q.="?,";
+		
+		}
+		
+		$f = substr_replace($f ,"",-1);
+		$v = substr_replace($v ,"",-1);
+		$q = substr_replace($q ,"",-1);
+		
+				
+		$sql = "INSERT INTO `".$this->tbl."`".$f.") VALUES ($q)";
+		
+		$i = 1;
+		
+		if ($result = $this->pdo->prepare($sql))
+		{
+			
+			foreach ($params as $key => $val) 
+			{
+				
+				$result->bindValue($i,$val);
+				
+				$i++;
+			
+			}
+		
+			$result->execute();
+			
+			$lId = $this->pdo->lastInsertId();
+			
+			return $lId;
+		
+		}
+		
+    }
 
 }
