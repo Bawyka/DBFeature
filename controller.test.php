@@ -5,7 +5,10 @@
 $m = new Feature();
 
 echo "<pre>";
+	
 
-// выведем все данные из Таблицы `users` в виде ассоциативного массива
-print_r( $m->users()->GetData() );
-
+    if (is_object($m->users()) && ($data = $m->users()->GetData())) {
+        print_r( $data );
+    } else {
+    echo 'таблицы `users` не существует, введите правильно имя таблицы';
+}
