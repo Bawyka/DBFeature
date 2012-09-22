@@ -360,5 +360,28 @@ class DriverDB extends DB {
 		}
 		
     }
+	
+	
+	/* Set table
+	 * @param (int) $t - table name
+	 */
+	public function SetTable( $t )
+	{
+	
+		if (!empty($t))
+		{
+		
+			$this->tbl = $t;
+		
+		}
+		else
+		{
+		
+			return FALSE;
+		
+		}
+	
+	}
+	
 
 }
