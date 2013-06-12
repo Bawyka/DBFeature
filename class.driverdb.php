@@ -273,7 +273,7 @@ class DriverDB extends DB {
 	 * @return (int) lastinserted identifier $lId
 	 */
 	public function PutData($params = array())
-    {
+	{
 		if (!$this->tbl) return false;
 		
 		$f = "("; $v = "("; $q = "";
@@ -306,7 +306,7 @@ class DriverDB extends DB {
 			
 			return $lId;
 		}
-    }
+	}
 	
 	/* 
 	 * Checking is Empty Table
