@@ -10,9 +10,10 @@
 ```php
 // Подключим саму библиотеку
 include('model.feature.php');
-$m = new Feature();
+// Создаем новый экземпляр класса Feature
+$ft = new Feature();
 // users - это имя Вашей таблицы !!!
-$m->users()->GetData();
+$ft->users()->GetData();
 ```
 
 ### методы:
