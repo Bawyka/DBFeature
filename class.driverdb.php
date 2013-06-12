@@ -1,4 +1,11 @@
-<?php require_once "class.database.php";
+<?php 
+
+/* Author Bawyka T.P.
+ * site https://github.com/Bawyka/feature
+ * License Free
+ */
+
+require_once "class.database.php";
 
 # ДРАЙВЕР ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ
 class DriverDB extends DB {
