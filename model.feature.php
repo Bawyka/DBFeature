@@ -7,9 +7,5 @@ class Feature extends DriverDB {
 	{
 		// вызываем конструктор родителя для работы с БД
 		parent::__construct();
-		
-		echo "Привет, Мир!";
-	
 	}
-
 }

@@ -11,11 +11,7 @@ class DB extends Config {
 		}
 		catch(PDOException $e)
 		{
-		
 			die("Error ". $e->getMessage());
-		
 		}
-	
 	}
-	
 }
