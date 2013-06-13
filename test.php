@@ -1,6 +1,6 @@
-<?php require_once "model.feature.php";
+<?php include("dbfeature.php");
 
-####### ТЕСТОВЫЙ КОНТРОЛЛЕР #######
+####### ТЕСТ #######
 
 /* Пример таблицы users */
 $query = "CREATE TABLE IF NOT EXISTS `users` (
@@ -12,7 +12,7 @@ $query = "CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
 
 
-$ft = new Feature();
+$ft = new DBFeature();
 
 // Создадим таблицу `users`
 if ($ft->Query($query))

@@ -1,24 +1,37 @@
 <?php 
 
 /* Author Bawyka T.P.
- * site https://github.com/Bawyka/feature
+ * site https://github.com/Bawyka/dbfeature
+ * version 2.0
  * License Free
  */
-
-require_once "class.database.php";
-
+ 
 # ДРАЙВЕР ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ
-class DriverDB extends DB {
+class DBFeature {
+
+	protected $DB_HOST = "localhost";
+	protected $DB_NAME = "test";
+	protected $DB_USER = "root";
+	protected $DB_PASS = "";
+	
+	public $CHARSET = "UTF-8";
 
 	// current table
 	protected $tbl = false;
 
 	function __construct(){
 	
-		parent::__construct();
+		try
+		{
+			$this->pdo = new PDO("mysql:host=".$this->DB_HOST.";dbname=".$this->DB_NAME.";charset=".$this->CHARSET,$this->DB_USER,$this->DB_PASS);
+		}
+		catch(PDOException $e)
+		{
+			die("Error ". $e->getMessage());
+		}
 		
 	}
-	
+		
 	// __call установит таблицу
 	public function __call( $method, $param )
 	{
