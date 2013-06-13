@@ -12,37 +12,37 @@ $query = "CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;";
 
 
-$ft = new DBFeature();
+$dbf = new DBFeature();
 
 // Создадим таблицу `users`
-if ($ft->Query($query))
+if ($dbf->Query($query))
 {
 	echo "Была создана таблица `users`!<br />";
 
 	// Если таблица `users` пуста, добавим туда запись
-	if ($ft->users()->isEmpty())
+	if ($dbf->users()->isEmpty())
 	{
 		$user = array('login'=>'Alex',
 					  'email'=>'alex@email.com',
 					  'password'=>'');
 					  
-		if ($lstid = $ft->users()->PutData($user))
+		if ($lstid = $dbf->users()->PutData($user))
 		{
 			echo "Пользователь `Alex` был успешно внесен в таблицу! <br />";
 		}
 	}
 
 	// Проверим существует ли наш пользователь
-	if ($ft->users()->ExistsRow('login','Alex'))
+	if ($dbf->users()->ExistsRow('login','Alex'))
 	{
 		echo "Есть такой пользователь! Установим ему пароль!";
 		
 		// Обновление данных
-		$ft->users()->UpdOne('password','123','login','Alex');
+		$dbf->users()->UpdOne('password','123','login','Alex');
 	}
 
 	// Выведем данные о пользователе 
-	if ($data = $ft->users()->GetRec('login','Alex'))
+	if ($data = $dbf->users()->GetRec('login','Alex'))
 	{
 		echo "<pre>";
 		print_r( $data );
@@ -50,7 +50,7 @@ if ($ft->Query($query))
 	}
 
 	// Удалим нашего пользователя
-	if ($ft->users()->DelOne('login','Alex'))
+	if ($dbf->users()->DelOne('login','Alex'))
 	{
 		echo "Пользователь `Alex` удален! <br />";
 	}
