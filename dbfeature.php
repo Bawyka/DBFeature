@@ -17,6 +17,9 @@ class DBFeature {
 	public $CHARSET = "UTF-8";
 	
 	protected $id = false;
+	protected $has_many = false;
+	protected $belongs_to = false;
+	protected $has_one = false;
 
 	// current table
 	protected $tbl = false;
@@ -54,10 +57,40 @@ class DBFeature {
 			// Параметр $param (array) по умолчанию является массивом
 			if (isset($param) and count($param)>0)
 			{
-				// Если только одно число передано, это будет $id
-				if (count($param)==1 and is_numeric($param[0]))
+				// Если задан только 1 параметр и он является числом, т.е. id
+				if (is_numeric($param[0]))
 				{
-					$this->id = $param[0];
+					$this->id = intval($param[0]);
+				}
+				
+				// Если введен массив с ключем id
+				if (is_array($param[0]) and array_key_exists('id',$param[0]))
+				{
+					$this->id = intval($param[0]['id']);
+					
+					// # ОДИН КО МНОГИМ # has_many
+					if (isset($param[0]['has_many']) and !empty($param[0]['has_many']))
+					{
+						// По дефолту ключ таблица_id
+						$key = (!isset($param[0]['key'])) ? $key = $this->tbl.'_id' : $param[0]['key'];
+						
+						$this->has_many = array(
+							'table'=>$param[0]['has_many'],
+							'key'=>$key,
+						);
+					}
+					
+					// # ОДИН К ОДНОМУ # has_one
+					if (isset($param[0]['has_one']) and !empty($param[0]['has_one']))
+					{
+						// По дефолту ключ таблица_id
+						$key = (!isset($param[0]['key'])) ? $key = $param[0]['has_one'].'_id' : $param[0]['key'];
+						
+						$this->has_one = array(
+							'table'=>$param[0]['has_one'],
+							'key'=>$key,
+						);
+					}
 				}
 			}
 		}
@@ -103,7 +136,19 @@ class DBFeature {
 	public function GetData()
 	{	
 		if (!$this->tbl) return false;
-	
+		
+		if (is_array($this->has_many))
+		{
+			if ($result = $this->pdo->prepare("SELECT * FROM ".$this->has_many['table']." WHERE ".$this->has_many['key']."=:id"))
+			{
+				$result->bindValue(':id',$this->id,PDO::PARAM_INT);
+				$result->execute();
+				$data = $result->fetchAll(PDO::FETCH_ASSOC);
+				
+				return $data;
+			}
+		}
+			
 		if ($result = $this->pdo->prepare("SELECT * FROM ".$this->tbl.""))
 		{
 			$result->execute();
@@ -209,9 +254,34 @@ class DBFeature {
 	 * @param $val - identifier value
 	 * @return $data
 	 */
-	public function GetOne($clm,$idn,$val)
+	public function GetOne($clm=NULL,$idn=NULL,$val=NULL)
 	{
 		if (!$this->tbl) return false;
+		
+		// Если есть связь has_one
+		if (is_array($this->has_one))
+		{
+			// Сначала ключ узнаем
+			if ($result = $this->pdo->prepare("SELECT ".$this->has_one['key']." as `key` FROM ".$this->tbl." WHERE id=:id LIMIT 1"))
+			{
+				$result->bindValue(':id',$this->id);
+				$result->execute();
+				$key = $result->fetch(PDO::FETCH_ASSOC)['key'];
+			}
+			
+			if (isset($key) and is_numeric($key))
+			{
+				// Связь has_one использует `id`
+				if ($result = $this->pdo->prepare("SELECT * FROM ".$this->has_one['table']." WHERE `id`=:key LIMIT 1"))
+				{	
+					$result->bindValue(':key',$key,PDO::PARAM_INT);
+					$result->execute();
+					$data = $result->fetchAll(PDO::FETCH_ASSOC);
+					
+					return $data;
+				}
+			}
+		}
 	
 		if ($result = $this->pdo->prepare("SELECT ".$clm." FROM `".$this->tbl."` WHERE `".$idn."`=:val LIMIT 1"))
 		{
