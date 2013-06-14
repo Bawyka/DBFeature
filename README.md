@@ -77,3 +77,14 @@ $dbf->users()->GetData();
 // method Query - выолняет любой запрос
 ->Query("SELECT * FROM `users`");
 ```
+
+#### Объект
+
+Если в таблице есть пользователь с `id=1`
+
+```php
+// Загрузим Объект
+$user_object = $dbf->users(1)->Load();
+// Выведем Его Email
+echo $user_object->email;
+```
