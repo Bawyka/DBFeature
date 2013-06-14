@@ -90,7 +90,7 @@ echo $user_object->email;
 #### Связи
 
 ```php
-  // # ОДИН КО МНОГИМ # has_many
+        // # ОДИН КО МНОГИМ # has_many
 	$posts = $dbf->users(array('id'=>1,'has_many'=>'posts','key'=>'users_id'))->GetData();
 	
 	// # ОДИН К ОДНОМУ # has_one
