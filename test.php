@@ -79,13 +79,12 @@ if ($dbf->Query($query))
 	*/
 	
 	// # ОДИН КО МНОГИМ # has_many
-	$posts = $dbf->users(array('id'=>1,'has_many'=>'posts'))->GetData();
+	$posts = $dbf->users(array('id'=>1,'has_many'=>'posts','key'=>'users_id'))->GetData();
 	
 	echo "<B>Один ко Многим:</B> <br />Выведем все посты Юзера с id = 1 <br />";
 	echo "<pre>";
 	print_r($posts);
 	echo "</pre>";
-	
 	
 	// # ОДИН К ОДНОМУ # has_one
 	$post_user = $dbf->posts(array('id'=>2,'has_one'=>'users'))->GetOne();
