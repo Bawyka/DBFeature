@@ -15,6 +15,8 @@ class DBFeature {
 	protected $DB_PASS = "";
 	
 	public $CHARSET = "UTF-8";
+	
+	protected $id = false;
 
 	// current table
 	protected $tbl = false;
@@ -47,7 +49,17 @@ class DBFeature {
 		
 		if (in_array($method,$tables))
 		{
-			$this->tbl = $method;					
+			$this->tbl = $method;
+			
+			// Параметр $param (array) по умолчанию является массивом
+			if (isset($param) and count($param)>0)
+			{
+				// Если только одно число передано, это будет $id
+				if (count($param)==1 and is_numeric($param[0]))
+				{
+					$this->id = $param[0];
+				}
+			}
 		}
 		else
 		{
@@ -55,6 +67,18 @@ class DBFeature {
 		}
 		
 		return $this;
+	}
+	
+	// Loading as Object
+	public function Load()
+	{
+		// Existance Check
+		if ($this->id and $this->ExistsRow('id',$this->id))
+		{
+			return (object)$this->GetOne('*','id',$this->id);
+		}
+		
+		return false;
 	}
 	
 	/* Query
@@ -189,15 +213,13 @@ class DBFeature {
 	{
 		if (!$this->tbl) return false;
 	
-		if ($result = $this->pdo->prepare("SELECT `".$clm."` FROM `".$this->tbl."` WHERE `".$idn."`=:val LIMIT 1"))
+		if ($result = $this->pdo->prepare("SELECT ".$clm." FROM `".$this->tbl."` WHERE `".$idn."`=:val LIMIT 1"))
 		{
 			$result->bindValue(":val",$val);
 			$result->execute();
 			$assoc = $result->fetch(PDO::FETCH_ASSOC);
-			$data = $assoc[$clm];
-			
-			return $data;
 		
+			return $assoc;
 		}
 		
 		return FALSE;

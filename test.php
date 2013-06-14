@@ -17,10 +17,10 @@ $dbf = new DBFeature();
 // Создадим таблицу `users`
 if ($dbf->Query($query))
 {
-	echo "Была создана таблица `users`!<br />";
+	echo "Была создана таблица `users`..<br />";
 
 	// Если таблица `users` пуста, добавим туда запись
-	if ($dbf->users()->isEmpty())
+	if ($dbf->users(1)->isEmpty())
 	{
 		$user = array('login'=>'Alex',
 					  'email'=>'alex@email.com',
@@ -28,15 +28,23 @@ if ($dbf->Query($query))
 					  
 		if ($lstid = $dbf->users()->PutData($user))
 		{
-			echo "Пользователь `Alex` был успешно внесен в таблицу! <br />";
+			echo "Пользователь `Alex` был успешно внесен в таблицу.. <br />";
 		}
+	}
+	
+	// Загрузим пользователя как Oбъект методом ->Load()
+	if (isset($lstid))
+	{
+		$user_object = $dbf->users($lstid)->Load();
+		// Выведем Его Email
+		echo $user_object->email.'..<br />';
 	}
 
 	// Проверим существует ли наш пользователь
 	if ($dbf->users()->ExistsRow('login','Alex'))
 	{
-		echo "Есть такой пользователь! Установим ему пароль!";
-		
+		echo "Есть такой пользователь...<br />Установим ему пароль.. <br />";
+				
 		// Обновление данных
 		$dbf->users()->UpdOne('password','123','login','Alex');
 	}
@@ -52,6 +60,6 @@ if ($dbf->Query($query))
 	// Удалим нашего пользователя
 	if ($dbf->users()->DelOne('login','Alex'))
 	{
-		echo "Пользователь `Alex` удален! <br />";
+		echo "Пользователь `Alex` удален.. <br />";
 	}
 }
